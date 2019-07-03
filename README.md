@@ -2,8 +2,6 @@
 notam-decoder
 =======
 
-[![Build Status](https://travis-ci.org/mourner/suncalc.svg?branch=master)](https://travis-ci.org/mourner/suncalc)
-
 notam-decoder is JavaScript library for parsing and decoding NOTAMs (Notices to Airmen).
 
 Most code was written based on a interpretation of documentation available from 
