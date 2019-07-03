@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- leaflet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css">
+    <style>
+        #mapid {
+            height: 400px;
+        }
+    </style>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- notam-decoder -->
+    <script src="../notam-decoder.js"></script>
+    <title>notam-decoder.js</title>
+</head>
+
+<body>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>notam-decoder.js</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+
+                <div class="row">
+                    <div class="col-12">
+                        <label for="notam-input">NOTAM input</label>
+                        <textarea oninput="resetLines()" class="form-control" id="notam-input" rows="13">
+A2260/19 NOTAMN
+Q) LPPC/QRALW/IV/NBO/W /000/073/4006N00809W019
+A) LPPC B) 1907071000 C) 1907071200
+E) AIRSPACE RESERVATION WILL TAKE PLACE FOR MILITARY CEREMONY AREA 
+BOUNDED BY: 402000N 0082200W - 401300N 0083100W - 395200N 0075300W - 
+400000N 0074600W - 402000N 0082200W.
+F) GND G) 4000FT AGL</textarea>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button onclick="decode()" type="button" class="btn btn-primary">Decode NOTAM</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div id="mapid"></div>
+            </div>
+        </div>
+        <div class="row  mt-3">
+            <div class="col-12">
+                <label for="json-output">JSON output</label>
+                <div class="card">
+
+                    <div class="card-body overflow-auto">
+                        <pre id="json-output" rows="3"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var group = L.featureGroup([]);
+
+        var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        var mymap = L.map('mapid', {
+            center: [38.8505, -8.8856],
+            zoom: 7,
+            layers: [tileLayer, group]
+        });
+
+
+
+
+
+        // notam tester
+
+        function resetLines() {
+            var text = document.getElementById('notam-input').value.trim();
+            text = text.replace(/\\n/g, '\n');
+            document.getElementById('notam-input').value = text;
+        }
+
+        function decode() {
+
+            // clean map
+            group.clearLayers();
+
+            var input = document.getElementById('notam-input').value;
+            var notam = notamDecoder.decode(input);
+            if (notam != null) {
+                var output = document.getElementById('json-output');
+                output.innerHTML = JSON.stringify(notam, null, 4);
+
+                // map stuff
+                if (notam.qualification != null) {
+                    if (notam.qualification.coordinates != null) {
+
+                        var circle = L.circle(notam.qualification.coordinates[0], {
+                            color: 'red',
+                            fillColor: '#f03',
+                            fillOpacity: 0.5,
+                            radius: notam.qualification.coordinates[1].radius
+                        });
+
+                        group.addLayer(circle);
+                    }
+                }
+                if (notam.content != null) {
+                    if (notam.content.area != null) {
+                        var polygon = L.polygon(notam.content.area, { color: 'red' });
+                        group.addLayer(polygon);
+                    }
+                }
+
+                mymap.panInsideBounds(group.getBounds());
+            }
+        }
+
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "notam-decoder",
+  "version": "1.0.0",
+  "description": "JavaScript library for decoding ICAO NOTAMs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfelix/notam-decoder.git"
+  },
+  "author": "David Felix",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfelix/notam-decoder/issues"
+  },
+  "homepage": "https://github.com/dfelix/notam-decoder",
+  "keywords": [
+    "notam",
+    "notice",
+    "airmen",
+    "aircraft",
+    "flight",
+    "paragliding",
+    "airspace",
+    "aviation"
+  ]
+}
